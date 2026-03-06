@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Familles recommandées – Guelmim Escapes</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- Sticky Navbar -->
+  <nav class="navbar scrolled" style="position:sticky;top:0;z-index:200;">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo" style="color:var(--brown-dark);">
+        <i class="fas fa-sun"></i> Guelmim<span>Escapes</span>
+      </a>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <a href="preferences.html" class="btn-outline" style="font-size:.85rem;padding:8px 18px;">
+          <i class="fas fa-sliders-h"></i> Modifier les critères
+        </a>
+        <a href="index.html" style="font-size:.85rem;color:var(--text-light);">Accueil</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================
+       PREFERENCES SUMMARY BAR
+  ======================== -->
+  <div class="prefs-summary" id="prefsSummary">
+    <div class="container">
+      <span style="font-size:.8rem;font-weight:600;color:var(--text-medium);margin-right:4px;">Votre recherche :</span>
+      <!-- Pills injected by JS -->
+    </div>
+  </div>
+
+  <!-- ========================
+       RESULTS HEADER
+  ======================== -->
+  <div class="results-header-band">
+    <h1><i class="fas fa-home" style="color:var(--orange-light);margin-right:10px;"></i>Familles d'accueil recommandées</h1>
+    <p>Sélectionnées et classées selon vos préférences personnalisées</p>
+    <div class="results-count" id="resultsCount">Chargement…</div>
+  </div>
+
+  <!-- ========================
+       RESULTS MAIN
+  ======================== -->
+  <div class="results-main">
+    <div class="container">
+
+      <!-- Toolbar: sort + count -->
+      <div class="results-toolbar">
+        <h3 id="resultsLabel">Familles correspondantes</h3>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label for="sortSelect" style="font-size:.85rem;color:var(--text-light);">Trier par :</label>
+          <select class="sort-select" id="sortSelect" onchange="renderResults()">
+            <option value="score">Meilleure correspondance</option>
+            <option value="price-asc">Prix croissant</option>
+            <option value="price-desc">Prix décroissant</option>
+            <option value="rating">Meilleures notes</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Family cards grid -->
+      <div class="families-grid" id="familiesGrid">
+        <!-- Injected by JS -->
+      </div>
+
+      <!-- Back to search button -->
+      <div style="text-align:center;margin-top:48px;">
+        <a href="preferences.html" class="btn-outline">
+          <i class="fas fa-arrow-left"></i> Modifier mes préférences
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+  <script>
+    // ============================================
+    // RESULTS PAGE SCRIPT
+    // ============================================
+
+    /* Load preferences from localStorage */
+    const prefs = JSON.parse(localStorage.getItem('ge_preferences') || 'null');
+
+    if (!prefs) {
+      // No preferences submitted — redirect to form
+      window.location.href = 'preferences.html';
+    }
+
+    /* Current user check */
+    const user = getCurrentUser();
+    if (!user) { window.location.href = 'auth.html'; }
+
+    /* Compute nights between arrival and departure */
+    function computeNights(arrival, departure) {
+      const ms = new Date(departure) - new Date(arrival);
+      return Math.max(1, Math.ceil(ms / (1000 * 60 * 60 * 24)));
+    }
+
+    const nights = computeNights(prefs.arrivalDate, prefs.departureDate);
+
+    /* ========================
+       BUILD PREFERENCES SUMMARY PILLS
+    ======================== */
+    function buildSummaryPills() {
+      const bar = document.querySelector('#prefsSummary .container');
+      const pills = [
+        { icon: 'fa-user',        text: prefs.firstName + ' ' + prefs.lastName },
+        { icon: 'fa-calendar-alt', text: formatDate(prefs.arrivalDate) + ' → ' + formatDate(prefs.departureDate) },
+        { icon: 'fa-moon',         text: nights + ' nuit' + (nights > 1 ? 's' : '') },
+        { icon: 'fa-users',        text: prefs.numPeople + ' personne' + (prefs.numPeople > 1 ? 's' : '') },
+        { icon: 'fa-euro-sign',    text: 'Budget : ' + prefs.budgetPerNight + '€/nuit' },
+        { icon: 'fa-globe-africa', text: prefs.familyType === 'no-preference' ? 'Toutes cultures' : prefs.familyType }
+      ];
+      if (prefs.interests && prefs.interests.length > 0) {
+        pills.push({ icon: 'fa-heart', text: prefs.interests.join(', ') });
+      }
+
+      const existing = bar.querySelector('span');
+      pills.forEach(p => {
+        const pill = document.createElement('span');
+        pill.className = 'prefs-pill';
+        pill.innerHTML = `<i class="fas ${p.icon}"></i> ${p.text}`;
+        bar.appendChild(pill);
+      });
+    }
+
+    buildSummaryPills();
+
+    /* ========================
+       RUN MATCHING & RENDER
+    ======================== */
+    let matchedFamilies = matchListings(prefs); // from script.js — uses approved localStorage listings
+
+    /* Update header counts */
+    document.getElementById('resultsCount').textContent =
+      matchedFamilies.length + ' famille' + (matchedFamilies.length !== 1 ? 's' : '') + ' trouvée' + (matchedFamilies.length !== 1 ? 's' : '');
+    document.getElementById('resultsLabel').textContent =
+      matchedFamilies.length + ' famille' + (matchedFamilies.length !== 1 ? 's' : '') + ' correspondent à vos critères';
+
+    /* Render results with selected sort order */
+    function renderResults() {
+      const sortVal = document.getElementById('sortSelect').value;
+      let sorted = [...matchedFamilies];
+
+      if (sortVal === 'price-asc')  sorted.sort((a, b) => a.pricePerNight - b.pricePerNight);
+      if (sortVal === 'price-desc') sorted.sort((a, b) => b.pricePerNight - a.pricePerNight);
+      if (sortVal === 'rating')     sorted.sort((a, b) => b.rating - a.rating);
+      // default: score (already sorted by matchFamilies)
+
+      const grid = document.getElementById('familiesGrid');
+      grid.innerHTML = '';
+
+      if (sorted.length === 0) {
+        grid.innerHTML = `
+          <div class="no-results">
+            <i class="fas fa-home"></i>
+            <h3>Aucune famille trouvée</h3>
+            <p>Aucune famille ne correspond exactement à vos critères actuels.<br />
+               Essayez d'augmenter votre budget ou de choisir "Pas de préférence" pour la culture.</p>
+            <a href="preferences.html" class="btn-primary" style="display:inline-flex;">
+              <i class="fas fa-sliders-h"></i> Modifier mes préférences
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      sorted.forEach((family, index) => {
+        const totalCost   = family.pricePerNight * nights;
+        const commission  = totalCost * 0.15;
+        const grandTotal  = totalCost + commission;
+
+        // Culture pill CSS class
+        const cultureClass = family.cultureType.toLowerCase();
+        const cultureLabel = family.cultureType === 'Mixed' ? 'Mixte' : family.cultureType;
+
+        // Score label
+        const scoreLabel = family.score >= 80 ? 'Excellent' :
+                           family.score >= 60 ? 'Très bon' :
+                           family.score >= 40 ? 'Bon'       : 'Compatible';
+
+        // Build reasons HTML
+        const reasonsHTML = family.reasons && family.reasons.length > 0
+          ? `<div class="match-reasons">
+               <div class="match-reasons-title"><i class="fas fa-check-circle"></i> Pourquoi ce match ?</div>
+               <ul>${family.reasons.map(r => `<li>${r}</li>`).join('')}</ul>
+             </div>`
+          : '';
+
+        const card = document.createElement('div');
+        card.className = 'family-card fade-in';
+        card.style.transitionDelay = (index * 0.07) + 's';
+
+        card.innerHTML = `
+          <div class="family-card-img">
+            <img src="${family.image}" alt="${family.familyName}" loading="lazy" />
+            <span class="culture-pill ${cultureClass}">
+              <i class="fas fa-${cultureClass === 'sahrawi' ? 'wind' : cultureClass === 'amazigh' ? 'mountain' : 'infinity'}"></i>
+              ${cultureLabel}
+            </span>
+            <span class="score-badge"><i class="fas fa-star"></i> ${scoreLabel}</span>
+          </div>
+          <div class="family-card-body">
+            <h3 class="family-name">${family.familyName}</h3>
+            <div class="family-area"><i class="fas fa-map-marker-alt"></i>${family.cityArea}</div>
+
+            <div class="family-meta">
+              <span><i class="fas fa-users"></i> Max ${family.maxGuests} pers.</span>
+              <span><i class="fas fa-moon"></i> ${nights} nuit${nights > 1 ? 's' : ''}</span>
+            </div>
+
+            <div class="family-rating">
+              <span class="stars-html">${renderStars(family.rating)}</span>
+              <strong>${family.rating}</strong>
+              <span>(${family.reviews} avis)</span>
+            </div>
+
+            <div class="family-langs">
+              ${family.languages.map(l => `<span class="lang-tag"><i class="fas fa-comments" style="font-size:.65rem;margin-right:3px;color:var(--sky);"></i>${l}</span>`).join('')}
+            </div>
+
+            <p style="font-size:.83rem;color:var(--text-light);line-height:1.6;margin-bottom:12px;">${family.description}</p>
+
+            ${reasonsHTML}
+
+            <div class="family-card-footer">
+              <div class="family-price">
+                <div class="amount">${family.pricePerNight}€</div>
+                <div class="per">/ nuit &nbsp;·&nbsp; Total : <strong style="color:var(--brown-dark);">${grandTotal.toFixed(0)}€</strong></div>
+              </div>
+              <button class="btn-primary" style="font-size:.85rem;padding:10px 20px;" onclick="requestBooking('${family.id}')">
+                <i class="fas fa-calendar-check"></i> Réserver
+              </button>
+            </div>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      // Re-trigger fade-in observer on new cards
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08 });
+      grid.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    }
+
+    renderResults();
+
+    /* ========================
+       REQUEST BOOKING (click "Réserver")
+    ======================== */
+    function requestBooking(familyId) {
+      if (!user) {
+        showToast('Veuillez vous connecter pour réserver.', 'error');
+        setTimeout(() => { window.location.href = 'auth.html'; }, 1200);
+        return;
+      }
+
+      // Find the selected family
+      const family = matchedFamilies.find(f => f.id === familyId);
+      if (!family) { showToast('Famille introuvable.', 'error'); return; }
+
+      // Compute costs
+      const baseCost   = family.pricePerNight * nights;
+      const commission = baseCost * COMMISSION_RATE;
+      const totalPrice = baseCost + commission;
+
+      // Build booking record
+      const booking = {
+        id:               generateRef(),
+        userId:           user.email,
+        firstName:        prefs.firstName,
+        lastName:         prefs.lastName,
+        phone:            prefs.phone,
+        arrivalDate:      prefs.arrivalDate,
+        departureDate:    prefs.departureDate,
+        numPeople:        prefs.numPeople,
+        specialRequests:  prefs.specialRequests,
+        selectedFamilyId:   family.id,
+        selectedListingId:  family.id,
+        selectedFamilyName: family.familyName,
+        familyCultureType:  family.cultureType,
+        familyArea:         family.cityArea,
+        hostOwnerUserId:    family.ownerUserId || null,
+        pricePerNight:    family.pricePerNight,
+        nights,
+        baseCost,
+        commission,
+        totalPrice,
+        status:           'Pending Payment',
+        paymentStatus:    'Unpaid',
+        createdAt:        new Date().toISOString()
+      };
+
+      // Store as pending booking for payment page
+      localStorage.setItem('ge_pending_booking', JSON.stringify(booking));
+
+      // Navigate to payment
+      window.location.href = 'payment.html';
+    }
+
+    // Expose globally for onclick attributes
+    window.requestBooking = requestBooking;
+  </script>
+</body>
+</html>

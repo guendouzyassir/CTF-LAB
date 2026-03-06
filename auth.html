@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion / Inscription – Guelmim Escapes</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="auth-page">
+
+  <div class="auth-card">
+
+    <div class="auth-logo">
+      <a href="index.html"><i class="fas fa-sun"></i> Guelmim<span>Escapes</span></a>
+    </div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="loginTab" onclick="switchTab('login')">
+        <i class="fas fa-sign-in-alt"></i> Connexion
+      </button>
+      <button class="auth-tab" id="registerTab" onclick="switchTab('register')">
+        <i class="fas fa-user-plus"></i> Inscription
+      </button>
+    </div>
+
+    <!-- ========================
+         LOGIN FORM
+    ======================== -->
+    <div class="auth-form active" id="loginForm">
+      <h2>Bienvenue</h2>
+      <p>Connectez-vous pour accéder à votre espace.</p>
+
+      <form id="loginFormEl" novalidate>
+        <div class="form-group">
+          <label for="loginEmail">Email *</label>
+          <input type="email" id="loginEmail" placeholder="vous@exemple.com" required />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Mot de passe *</label>
+          <div style="position:relative;">
+            <input type="password" id="loginPassword" placeholder="Votre mot de passe" required style="padding-right:44px;" />
+            <button type="button" onclick="togglePwd('loginPassword',this)"
+              style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-light);">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit"><i class="fas fa-sign-in-alt"></i> Se connecter</button>
+
+        <!-- Demo accounts -->
+        <div style="margin-top:18px;padding:14px;background:var(--bg-light);border-radius:var(--radius-sm);border:1px solid var(--border);font-size:.8rem;color:var(--text-light);">
+          <strong style="color:var(--text-medium);">Comptes de démo :</strong><br />
+          <i class="fas fa-user-shield" style="color:var(--gold);"></i> Admin : <code>admin@guelmim.com</code> / <code>admin123</code><br />
+          <i class="fas fa-home" style="color:var(--sky);"></i> Hôte : <code>hote@guelmim.com</code> / <code>hote123</code><br />
+          <i class="fas fa-hiking" style="color:var(--orange);"></i> Touriste : <code>touriste@guelmim.com</code> / <code>tourist123</code>
+        </div>
+      </form>
+
+      <p style="text-align:center;margin-top:18px;font-size:.88rem;color:var(--text-light);">
+        Pas de compte ?
+        <a href="#" onclick="switchTab('register')" style="color:var(--orange);font-weight:600;">S'inscrire</a>
+      </p>
+    </div>
+
+    <!-- ========================
+         REGISTER FORM
+    ======================== -->
+    <div class="auth-form" id="registerForm">
+      <h2>Créer un compte</h2>
+      <p>Rejoignez la communauté Guelmim Escapes.</p>
+
+      <form id="registerFormEl" novalidate>
+        <div class="form-group">
+          <label for="regName">Nom complet *</label>
+          <input type="text" id="regName" placeholder="Ahmed Benali" required />
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Email *</label>
+          <input type="email" id="regEmail" placeholder="vous@exemple.com" required />
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Mot de passe * (6 car. min)</label>
+          <div style="position:relative;">
+            <input type="password" id="regPassword" placeholder="Minimum 6 caractères" required style="padding-right:44px;" />
+            <button type="button" onclick="togglePwd('regPassword',this)"
+              style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-light);">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Role selection — 3 roles -->
+        <div class="form-group">
+          <label>Votre rôle *</label>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+            <!-- Tourist -->
+            <div class="role-option">
+              <input type="radio" name="role" id="roleTourist" value="tourist" checked />
+              <label class="role-label" for="roleTourist" style="flex-direction:column;gap:4px;text-align:center;padding:14px 8px;">
+                <i class="fas fa-hiking" style="font-size:1.3rem;"></i>
+                <span>Touriste</span>
+              </label>
+            </div>
+            <!-- Host -->
+            <div class="role-option">
+              <input type="radio" name="role" id="roleHost" value="host" />
+              <label class="role-label" for="roleHost" style="flex-direction:column;gap:4px;text-align:center;padding:14px 8px;">
+                <i class="fas fa-home" style="font-size:1.3rem;"></i>
+                <span>Hôte</span>
+              </label>
+            </div>
+            <!-- Admin -->
+            <div class="role-option">
+              <input type="radio" name="role" id="roleAdmin" value="admin" />
+              <label class="role-label" for="roleAdmin" style="flex-direction:column;gap:4px;text-align:center;padding:14px 8px;">
+                <i class="fas fa-user-shield" style="font-size:1.3rem;"></i>
+                <span>Admin</span>
+              </label>
+            </div>
+          </div>
+          <!-- Role description hint -->
+          <p id="roleHint" style="font-size:.78rem;color:var(--text-light);margin-top:8px;padding:8px 12px;background:var(--bg-light);border-radius:var(--radius-sm);">
+            <i class="fas fa-info-circle" style="color:var(--orange);"></i>
+            <span id="roleHintText">Recherchez et réservez chez des familles d'accueil.</span>
+          </p>
+        </div>
+
+        <button type="submit" class="btn-submit"><i class="fas fa-user-plus"></i> Créer mon compte</button>
+      </form>
+
+      <p style="text-align:center;margin-top:18px;font-size:.88rem;color:var(--text-light);">
+        Déjà inscrit ?
+        <a href="#" onclick="switchTab('login')" style="color:var(--orange);font-weight:600;">Se connecter</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============================================
+    // AUTH PAGE SCRIPT
+    // ============================================
+
+    const ROLE_HINTS = {
+      tourist: 'Recherchez et réservez chez des familles d\'accueil.',
+      host:    'Publiez votre annonce familiale et accueillez des voyageurs.',
+      admin:   'Gérez les annonces, réservations et utilisateurs de la plateforme.'
+    };
+
+    function togglePwd(id, btn) {
+      const input = document.getElementById(id);
+      const icon  = btn.querySelector('i');
+      input.type  = input.type === 'password' ? 'text' : 'password';
+      icon.className = input.type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+    }
+
+    function switchTab(tab) {
+      ['login','register'].forEach(t => {
+        document.getElementById(t+'Tab').classList.toggle('active', t===tab);
+        document.getElementById(t+'Form').classList.toggle('active', t===tab);
+      });
+    }
+
+    function showToast(msg, type='info') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'toast show ' + type;
+      setTimeout(() => { t.className = 'toast'; }, 3500);
+    }
+
+    /* Role hint update */
+    document.querySelectorAll('input[name="role"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.getElementById('roleHintText').textContent = ROLE_HINTS[radio.value];
+      });
+    });
+
+    /* Seed demo accounts */
+    function seedDemo() {
+      let users = JSON.parse(localStorage.getItem('ge_users') || '[]');
+      const emails = users.map(u => u.email);
+      const demos = [
+        { name:'Admin',         email:'admin@guelmim.com',    password:'admin123',   role:'admin',   createdAt: new Date().toISOString() },
+        { name:'Hôte Demo',     email:'hote@guelmim.com',     password:'hote123',    role:'host',    createdAt: new Date().toISOString() },
+        { name:'Touriste Demo', email:'touriste@guelmim.com', password:'tourist123', role:'tourist', createdAt: new Date().toISOString() }
+      ];
+      demos.forEach(d => { if (!emails.includes(d.email)) users.push(d); });
+      localStorage.setItem('ge_users', JSON.stringify(users));
+    }
+    seedDemo();
+
+    /* Auto-switch tab if ?mode=register */
+    if (new URLSearchParams(window.location.search).get('mode') === 'register') switchTab('register');
+
+    /* Redirect if already logged in */
+    const me = JSON.parse(localStorage.getItem('ge_current_user') || 'null');
+    if (me) {
+      const dest = me.role === 'admin' ? 'admin.html' : me.role === 'host' ? 'host.html' : 'index.html';
+      window.location.href = dest;
+    }
+
+    const returnTo = new URLSearchParams(window.location.search).get('return') || null;
+
+    /** Redirect user to their role home */
+    function roleRedirect(user) {
+      if (returnTo)              window.location.href = returnTo;
+      else if (user.role === 'admin') window.location.href = 'admin.html';
+      else if (user.role === 'host')  window.location.href = 'host.html';
+      else                       window.location.href = 'index.html';
+    }
+
+    /* ---- LOGIN ---- */
+    document.getElementById('loginFormEl').addEventListener('submit', e => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const pwd   = document.getElementById('loginPassword').value;
+      if (!email || !pwd) { showToast('Remplissez tous les champs.', 'error'); return; }
+
+      const users = JSON.parse(localStorage.getItem('ge_users') || '[]');
+      const user  = users.find(u => u.email.toLowerCase() === email && u.password === pwd);
+      if (!user) { showToast('Identifiants incorrects.', 'error'); return; }
+
+      localStorage.setItem('ge_current_user', JSON.stringify(user));
+      showToast('Bienvenue, ' + user.name + ' !', 'success');
+      setTimeout(() => roleRedirect(user), 900);
+    });
+
+    /* ---- REGISTER ---- */
+    document.getElementById('registerFormEl').addEventListener('submit', e => {
+      e.preventDefault();
+      const name  = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const pwd   = document.getElementById('regPassword').value;
+      const role  = document.querySelector('input[name="role"]:checked').value;
+
+      if (!name || !email || !pwd) { showToast('Remplissez tous les champs.', 'error'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Email invalide.', 'error'); return; }
+      if (pwd.length < 6) { showToast('Mot de passe trop court (6 car. min).', 'error'); return; }
+
+      const users = JSON.parse(localStorage.getItem('ge_users') || '[]');
+      if (users.find(u => u.email === email)) { showToast('Email déjà utilisé.', 'error'); return; }
+
+      const newUser = { name, email, password: pwd, role, createdAt: new Date().toISOString() };
+      users.push(newUser);
+      localStorage.setItem('ge_users', JSON.stringify(users));
+      localStorage.setItem('ge_current_user', JSON.stringify(newUser));
+      showToast('Compte créé ! Bienvenue, ' + name + ' !', 'success');
+      setTimeout(() => roleRedirect(newUser), 900);
+    });
+  </script>
+</body>
+</html>

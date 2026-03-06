@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Espace Hôte – Guelmim Escapes</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="admin-page">
+
+  <!-- Mobile hamburger -->
+  <button class="admin-hamburger" id="adminHamburger" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- ========================
+       HOST SIDEBAR
+  ======================== -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="admin-sidebar-logo">
+      <a href="index.html" class="nav-logo" style="font-size:1.2rem;">
+        <i class="fas fa-sun"></i> Guelmim<span>Escapes</span>
+      </a>
+      <p style="color:rgba(255,255,255,.35);font-size:.72rem;margin-top:4px;">
+        Espace Hôte
+      </p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="active" onclick="showView('overview', this)">
+        <i class="fas fa-tachometer-alt"></i> Aperçu
+      </a>
+      <a href="#" onclick="showView('listing', this)" id="sidebarListingLink">
+        <i class="fas fa-home"></i> Mon Annonce
+      </a>
+      <a href="#" onclick="showView('bookings', this)">
+        <i class="fas fa-calendar-check"></i> Mes Réservations
+        <span class="notif-badge hidden" id="notifBadge">0</span>
+      </a>
+      <a href="index.html">
+        <i class="fas fa-globe"></i> Voir le site
+      </a>
+      <a href="#" class="logout-btn" onclick="hostLogout()">
+        <i class="fas fa-sign-out-alt"></i> Déconnexion
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ========================
+       MAIN CONTENT
+  ======================== -->
+  <main class="admin-main">
+
+    <!-- Top bar -->
+    <div class="admin-topbar">
+      <div>
+        <h1 id="pageTitle">Aperçu</h1>
+        <p>Bonjour, <strong id="hostName">Hôte</strong>
+          <span class="role-badge host" style="margin-left:8px;">
+            <i class="fas fa-home"></i> Hôte
+          </span>
+        </p>
+      </div>
+      <div style="font-size:.8rem;color:var(--text-light);">
+        <i class="fas fa-calendar" style="color:var(--orange);"></i>
+        <span id="todayDate"></span>
+      </div>
+    </div>
+
+    <!-- ========================
+         VIEW: OVERVIEW
+    ======================== -->
+    <div class="admin-view active" id="view-overview">
+
+      <!-- Listing status banner -->
+      <div id="overviewListingBanner"></div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon orange"><i class="fas fa-calendar-check"></i></div>
+          <div class="stat-info">
+            <strong id="stat-totalBookings">0</strong>
+            <span>Réservations totales</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon sky"><i class="fas fa-check-double"></i></div>
+          <div class="stat-info">
+            <strong id="stat-paidBookings">0</strong>
+            <span>Réservations payées</span>
+          </div>
+        </div>
+        <div class="earnings-card" style="flex:1;min-width:220px;">
+          <div class="stat-icon gold" style="background:rgba(255,255,255,.15);">
+            <i class="fas fa-euro-sign"></i>
+          </div>
+          <div class="stat-info">
+            <strong id="stat-earnings">0€</strong>
+            <span>Vos gains (hors commission)</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon brown"><i class="fas fa-star"></i></div>
+          <div class="stat-info">
+            <strong id="stat-rating">—</strong>
+            <span>Note de votre annonce</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent bookings -->
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <h3><i class="fas fa-clock"></i> Réservations récentes</h3>
+          <a href="#" onclick="showView('bookings',null)" style="font-size:.85rem;color:var(--orange);font-weight:600;">
+            Voir tout <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Réf.</th><th>Voyageur</th><th>Dates</th><th>Nuits</th><th>Gains</th><th>Statut</th></tr>
+            </thead>
+            <tbody id="recentBookingsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================
+         VIEW: MY LISTING
+    ======================== -->
+    <div class="admin-view" id="view-listing">
+
+      <!-- Listing status banner (injected by JS) -->
+      <div id="listingStatusBanner"></div>
+
+      <!-- Form card -->
+      <div style="background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);overflow:hidden;">
+        <div style="background:linear-gradient(135deg,var(--brown-dark),#7A3810);padding:28px 36px;color:var(--white);">
+          <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:4px;" id="listingFormTitle">
+            <i class="fas fa-home" style="margin-right:10px;color:var(--orange-light);"></i>Mon Annonce Familiale
+          </h2>
+          <p style="color:rgba(255,255,255,.75);font-size:.9rem;">
+            Complétez votre annonce pour apparaître dans les résultats de recherche des voyageurs.
+          </p>
+        </div>
+
+        <div style="padding:32px 36px;">
+          <form id="listingForm" novalidate>
+
+            <!-- SECTION 1: Basic Info -->
+            <div class="listing-section">
+              <h3 class="listing-section-title"><i class="fas fa-user"></i> Informations de base</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="lFamilyName">Nom de la famille * (affiché)</label>
+                  <input type="text" id="lFamilyName" placeholder="Famille Aït Brahim" required />
+                </div>
+                <div class="form-group">
+                  <label for="lHostName">Nom complet de l'hôte *</label>
+                  <input type="text" id="lHostName" placeholder="Fatima Aït Brahim" required />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="lPhone">Téléphone *</label>
+                  <input type="tel" id="lPhone" placeholder="+212 6XX XXX XXX" required />
+                </div>
+                <div class="form-group">
+                  <label for="lWhatsapp">WhatsApp</label>
+                  <input type="tel" id="lWhatsapp" placeholder="+212 6XX XXX XXX" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="lEmail">Email de contact *</label>
+                <input type="email" id="lEmail" placeholder="vosfamille@exemple.com" required />
+              </div>
+            </div>
+
+            <!-- SECTION 2: Location & Pricing -->
+            <div class="listing-section">
+              <h3 class="listing-section-title"><i class="fas fa-map-marker-alt"></i> Localisation &amp; Tarifs</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="lCulture">Type de culture *</label>
+                  <select id="lCulture" required>
+                    <option value="">Choisissez…</option>
+                    <option value="Amazigh">Amazigh / Chleuh</option>
+                    <option value="Sahrawi">Sahrawi</option>
+                    <option value="Mixed">Mixte</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="lArea">Secteur *</label>
+                  <select id="lArea" required>
+                    <option value="">Choisissez…</option>
+                    <option value="Centre-ville">Centre-ville</option>
+                    <option value="Quartier du souk">Quartier du souk</option>
+                    <option value="Périphérie">Périphérie</option>
+                    <option value="Route du désert">Route du désert</option>
+                    <option value="Autre">Autre</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="lPrice">Prix par nuit (€) *</label>
+                  <input type="number" id="lPrice" min="10" max="500" placeholder="45" required />
+                </div>
+                <div class="form-group">
+                  <label for="lMaxGuests">Nombre max de personnes *</label>
+                  <input type="number" id="lMaxGuests" min="1" max="20" placeholder="4" required />
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 3: Availability -->
+            <div class="listing-section">
+              <h3 class="listing-section-title"><i class="fas fa-calendar-alt"></i> Disponibilité</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="lAvailFrom">Disponible à partir du *</label>
+                  <input type="date" id="lAvailFrom" required />
+                </div>
+                <div class="form-group">
+                  <label for="lAvailTo">Disponible jusqu'au *</label>
+                  <input type="date" id="lAvailTo" required />
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 4: Languages -->
+            <div class="listing-section">
+              <h3 class="listing-section-title"><i class="fas fa-comments"></i> Langues parlées</h3>
+              <div class="lang-grid">
+                <div class="lang-option">
+                  <input type="checkbox" id="lang-ar" value="Arabe" />
+                  <label class="lang-cb-label" for="lang-ar"><i class="fas fa-globe"></i>Arabe</label>
+                </div>
+                <div class="lang-option">
+                  <input type="checkbox" id="lang-tam" value="Tamazight" />
+                  <label class="lang-cb-label" for="lang-tam"><i class="fas fa-star"></i>Tamazight</label>
+                </div>
+                <div class="lang-option">
+                  <input type="checkbox" id="lang-has" value="Hassaniya" />
+                  <label class="lang-cb-label" for="lang-has"><i class="fas fa-wind"></i>Hassaniya</label>
+                </div>
+                <div class="lang-option">
+                  <input type="checkbox" id="lang-fr" value="Français" />
+                  <label class="lang-cb-label" for="lang-fr"><i class="fas fa-flag"></i>Français</label>
+                </div>
+                <div class="lang-option">
+                  <input type="checkbox" id="lang-en" value="Anglais" />
+                  <label class="lang-cb-label" for="lang-en"><i class="fas fa-globe-americas"></i>Anglais</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 5: Interests / Tags -->
+            <div class="listing-section">
+              <h3 class="listing-section-title"><i class="fas fa-heart"></i> Centres d'intérêt proposés</h3>
+              <div class="interests-grid">
+                <div class="interest-option">
+                  <input type="checkbox" id="tag-food"       value="Food" />
+                  <label class="interest-label" for="tag-food"><i class="fas fa-utensils"></i> Cuisine</label>
+                </div>
+                <div class="interest-option">
+                  <input type="checkbox" id="tag-culture"    value="Culture" />
+                  <label class="interest-label" for="tag-culture"><i class="fas fa-landmark"></i> Culture</label>
+                </div>
+                <div class="interest-option">
+                  <input type="checkbox" id="tag-desert"     value="Desert" />
+                  <label class="interest-label" for="tag-desert"><i class="fas fa-sun"></i> Désert</label>
+                </div>
+                <div class="interest-option">
+                  <input type="checkbox" id="tag-souk"       value="Souk" />
+                  <label class="interest-label" for="tag-souk"><i class="fas fa-store"></i> Souk</label>
+                </div>
+                <div class="interest-option">
+                  <input type="checkbox" id="tag-music"      value="Music" />
+                  <label class="interest-label" for="tag-music"><i class="fas fa-music"></i> Musique</label>
+                </div>
+                <div class="interest-option">
+                  <input type="checkbox" id="tag-handicrafts" value="Handicrafts" />
+                  <label class="interest-label" for="tag-handicrafts"><i class="fas fa-paint-brush"></i> Artisanat</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 6: Amenities -->
+            <div class="listing-section">
+              <h3 class="listing-section-title"><i class="fas fa-concierge-bell"></i> Services &amp; Équipements</h3>
+              <div class="amenities-grid">
+                <div class="amenity-option">
+                  <input type="checkbox" id="am-wifi"    value="Wi-Fi" />
+                  <label class="amenity-label" for="am-wifi"><i class="fas fa-wifi"></i> Wi-Fi</label>
+                </div>
+                <div class="amenity-option">
+                  <input type="checkbox" id="am-room"    value="Private Room" />
+                  <label class="amenity-label" for="am-room"><i class="fas fa-door-closed"></i> Chambre privée</label>
+                </div>
+                <div class="amenity-option">
+                  <input type="checkbox" id="am-meals"   value="Meals Included" />
+                  <label class="amenity-label" for="am-meals"><i class="fas fa-utensils"></i> Repas inclus</label>
+                </div>
+                <div class="amenity-option">
+                  <input type="checkbox" id="am-transp"  value="Transport Pickup" />
+                  <label class="amenity-label" for="am-transp"><i class="fas fa-car"></i> Navette transport</label>
+                </div>
+                <div class="amenity-option">
+                  <input type="checkbox" id="am-guide"   value="Guide Support" />
+                  <label class="amenity-label" for="am-guide"><i class="fas fa-map-signs"></i> Guide local</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 7: Description & Rules -->
+            <div class="listing-section">
+              <h3 class="listing-section-title"><i class="fas fa-align-left"></i> Description &amp; Règles</h3>
+              <div class="form-group">
+                <label for="lDescription">Description de votre famille *</label>
+                <textarea id="lDescription" rows="4" placeholder="Décrivez votre famille, votre maison et ce que vous proposez aux voyageurs…" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="lRules">Règles de la maison</label>
+                <textarea id="lRules" rows="3" placeholder="Horaires, règles, consignes particulières…"></textarea>
+              </div>
+            </div>
+
+            <!-- SECTION 8: Photos -->
+            <div class="listing-section">
+              <h3 class="listing-section-title"><i class="fas fa-images"></i> Photos (URL)</h3>
+              <p style="font-size:.82rem;color:var(--text-light);margin-bottom:14px;">
+                Entrez jusqu'à 4 URL d'images. Laissez vide pour utiliser les images par défaut.
+              </p>
+              <div class="image-url-grid">
+                <div class="img-url-wrap">
+                  <img class="img-preview" id="prev1" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=300&q=60" alt="Photo 1" />
+                  <input class="img-url-input" type="url" id="imgUrl1" placeholder="https://... (photo principale)" oninput="previewImg(this,'prev1')" />
+                </div>
+                <div class="img-url-wrap">
+                  <img class="img-preview" id="prev2" src="https://images.unsplash.com/photo-1566041510639-8d95a2490bfb?w=300&q=60" alt="Photo 2" />
+                  <input class="img-url-input" type="url" id="imgUrl2" placeholder="https://... (photo 2)" oninput="previewImg(this,'prev2')" />
+                </div>
+                <div class="img-url-wrap">
+                  <img class="img-preview" id="prev3" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&q=60" alt="Photo 3" />
+                  <input class="img-url-input" type="url" id="imgUrl3" placeholder="https://... (photo 3)" oninput="previewImg(this,'prev3')" />
+                </div>
+                <div class="img-url-wrap">
+                  <img class="img-preview" id="prev4" src="https://images.unsplash.com/photo-1534482421-64566f976cfa?w=300&q=60" alt="Photo 4" />
+                  <input class="img-url-input" type="url" id="imgUrl4" placeholder="https://... (photo 4)" oninput="previewImg(this,'prev4')" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit -->
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <button type="submit" class="btn-submit" id="listingSubmitBtn" style="flex:1;">
+                <i class="fas fa-paper-plane"></i> <span id="listingSubmitLabel">Soumettre pour approbation</span>
+              </button>
+              <button type="button" id="listingDeleteBtn" class="btn-delete hidden"
+                style="padding:15px 24px;font-size:1rem;border-radius:50px;"
+                onclick="deleteMyListing()">
+                <i class="fas fa-trash"></i> Supprimer l'annonce
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================
+         VIEW: MY BOOKINGS
+    ======================== -->
+    <div class="admin-view" id="view-bookings">
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <h3><i class="fas fa-calendar-check"></i> Réservations pour mon annonce</h3>
+        </div>
+        <div class="table-toolbar">
+          <input type="text" class="table-search" id="bookingSearch"
+            placeholder="Rechercher par nom ou référence…" oninput="renderHostBookings()" />
+          <select id="bookingStatusFilter" onchange="renderHostBookings()"
+            style="padding:8px 14px;border:1.5px solid var(--border);border-radius:50px;font-size:.875rem;background:var(--off-white);outline:none;cursor:pointer;">
+            <option value="all">Tous les statuts</option>
+            <option value="PendingPayment">En attente de paiement</option>
+            <option value="Paid">Payé</option>
+            <option value="ApprovedByHost">Approuvé</option>
+            <option value="RejectedByHost">Rejeté</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Réf.</th>
+                <th>Voyageur</th>
+                <th>Arrivée</th>
+                <th>Départ</th>
+                <th>Personnes</th>
+                <th>Nuits</th>
+                <th>Vos gains</th>
+                <th>Paiement</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="hostBookingsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+  <script>
+    // ============================================
+    // HOST DASHBOARD SCRIPT
+    // ============================================
+
+    /* ---- Route guard: host only ---- */
+    if (!requireRole('host')) { /* redirects inside requireRole */ }
+
+    const hostUser = getCurrentUser();
+    document.getElementById('hostName').textContent  = hostUser.name;
+    document.getElementById('todayDate').textContent = new Date().toLocaleDateString('fr-FR', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+    /* ---- Toggle sidebar ---- */
+    function toggleSidebar() {
+      document.getElementById('adminSidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('active');
+    }
+
+    /* ---- Logout ---- */
+    function hostLogout() {
+      localStorage.removeItem('ge_current_user');
+      window.location.href = 'auth.html';
+    }
+
+    /* ---- Notification badge ---- */
+    function refreshNotifBadge() {
+      const count = getUnreadCount(hostUser.email);
+      const badge = document.getElementById('notifBadge');
+      if (count > 0) {
+        badge.textContent = count;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+    refreshNotifBadge();
+
+    /* ========================
+       SWITCH VIEWS
+    ======================== */
+    function showView(name, link) {
+      document.querySelectorAll('.admin-view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+      const view = document.getElementById('view-' + name);
+      if (view) view.classList.add('active');
+      if (link) link.classList.add('active');
+
+      const titles = { overview:'Aperçu', listing:'Mon Annonce', bookings:'Mes Réservations' };
+      document.getElementById('pageTitle').textContent = titles[name] || name;
+
+      if (name === 'overview') { loadOverviewStats(); renderRecentBookings(); renderListingBanner('overviewListingBanner'); }
+      if (name === 'listing')  { loadListingForm(); }
+      if (name === 'bookings') { renderHostBookings(); markAllRead(hostUser.email); refreshNotifBadge(); }
+
+      document.getElementById('adminSidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('active');
+    }
+
+    /* ========================
+       LISTING STATUS BANNER
+    ======================== */
+    function renderListingBanner(containerId) {
+      const listing = getHostListing(hostUser.email);
+      const el = document.getElementById(containerId);
+      if (!el) return;
+
+      if (!listing) {
+        el.innerHTML = `
+          <div class="listing-status-banner pending" style="cursor:pointer;" onclick="showView('listing', document.getElementById('sidebarListingLink'))">
+            <i class="fas fa-plus-circle"></i>
+            <div>
+              <h4>Aucune annonce publiée</h4>
+              <p>Cliquez ici ou sur "Mon Annonce" pour créer votre annonce familiale et accueillir des voyageurs.</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const statusMap = {
+        PendingApproval: { cls:'pending',  icon:'fa-clock',        title:'En attente d\'approbation',
+          desc:'Votre annonce est en cours d\'examen par l\'administrateur.' },
+        Approved:        { cls:'approved', icon:'fa-check-circle', title:'Annonce approuvée ✓',
+          desc:'Votre annonce est visible par les voyageurs dans les résultats de recherche.' },
+        Rejected:        { cls:'rejected', icon:'fa-times-circle', title:'Annonce rejetée',
+          desc:'Votre annonce a été rejetée. Veuillez la modifier et la resoumettre.' }
+      };
+
+      const s = statusMap[listing.status] || statusMap['PendingApproval'];
+      el.innerHTML = `
+        <div class="listing-status-banner ${s.cls}">
+          <i class="fas ${s.icon}"></i>
+          <div>
+            <h4>${s.title}</h4>
+            <p>${s.desc} — <strong>${listing.familyName}</strong></p>
+          </div>
+        </div>`;
+    }
+
+    /* ========================
+       OVERVIEW STATS
+    ======================== */
+    function loadOverviewStats() {
+      const listing = getHostListing(hostUser.email);
+      const allBookings = getBookings().filter(b => b.hostOwnerUserId === hostUser.email);
+      const paidBookings = allBookings.filter(b => b.paymentStatus === 'Paid');
+      const earnings = paidBookings.reduce((s, b) => s + (b.baseCost || 0), 0);
+
+      document.getElementById('stat-totalBookings').textContent = allBookings.length;
+      document.getElementById('stat-paidBookings').textContent  = paidBookings.length;
+      document.getElementById('stat-earnings').textContent      = earnings.toFixed(2) + '€';
+      document.getElementById('stat-rating').textContent        = listing ? listing.rating || '4.5' : '—';
+
+      renderListingBanner('overviewListingBanner');
+    }
+
+    /* ========================
+       RECENT BOOKINGS (overview)
+    ======================== */
+    function renderRecentBookings() {
+      const bookings = getBookings()
+        .filter(b => b.hostOwnerUserId === hostUser.email)
+        .slice().reverse().slice(0, 5);
+      const tbody = document.getElementById('recentBookingsBody');
+
+      if (bookings.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-calendar-times"></i><p>Aucune réservation.</p></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = bookings.map(b => `
+        <tr>
+          <td><code style="color:var(--orange);font-size:.78rem;">${b.id}</code></td>
+          <td>${b.firstName} ${b.lastName}</td>
+          <td>${formatDate(b.arrivalDate)}</td>
+          <td>${b.nights || 1}</td>
+          <td><strong style="color:var(--green);">${(b.baseCost||0).toFixed(2)}€</strong></td>
+          <td>${hostStatusBadge(b.status, b.paymentStatus)}</td>
+        </tr>
+      `).join('');
+    }
+
+    /* ========================
+       HOST STATUS BADGE HTML
+    ======================== */
+    function hostStatusBadge(status, paymentStatus) {
+      if (paymentStatus === 'Paid' && status === 'Confirmed')
+        return `<span class="status-badge paid" style="font-size:.72rem;"><i class="fas fa-check-circle"></i> Confirmé</span>`;
+      if (status === 'ApprovedByHost')
+        return `<span class="status-badge approved" style="font-size:.72rem;"><i class="fas fa-thumbs-up"></i> Approuvé</span>`;
+      if (status === 'RejectedByHost')
+        return `<span class="status-badge rejected" style="font-size:.72rem;"><i class="fas fa-times-circle"></i> Rejeté</span>`;
+      if (paymentStatus === 'Paid')
+        return `<span class="status-badge paid" style="font-size:.72rem;"><i class="fas fa-euro-sign"></i> Payé</span>`;
+      return `<span class="status-badge pending" style="font-size:.72rem;"><i class="fas fa-clock"></i> En attente</span>`;
+    }
+
+    /* ========================
+       HOST BOOKINGS TABLE
+    ======================== */
+    function renderHostBookings() {
+      const search  = (document.getElementById('bookingSearch')?.value || '').toLowerCase();
+      const filter  = document.getElementById('bookingStatusFilter')?.value || 'all';
+      let bookings  = getBookings()
+        .filter(b => b.hostOwnerUserId === hostUser.email)
+        .slice().reverse();
+
+      if (search) bookings = bookings.filter(b =>
+        (b.firstName+' '+b.lastName).toLowerCase().includes(search) ||
+        (b.id||'').toLowerCase().includes(search)
+      );
+      if (filter !== 'all') bookings = bookings.filter(b => b.status === filter);
+
+      const tbody = document.getElementById('hostBookingsBody');
+      if (bookings.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><i class="fas fa-calendar-times"></i><p>Aucune réservation trouvée.</p></div></td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = bookings.map(b => `
+        <tr>
+          <td><code style="color:var(--orange);font-size:.75rem;">${b.id}</code></td>
+          <td><strong>${b.firstName} ${b.lastName}</strong><br/>
+              <span style="font-size:.75rem;color:var(--text-light);">${b.phone||''}</span></td>
+          <td>${formatDate(b.arrivalDate)}</td>
+          <td>${formatDate(b.departureDate)}</td>
+          <td>${b.numPeople}</td>
+          <td>${b.nights||1}</td>
+          <td><strong style="color:var(--green);">${(b.baseCost||0).toFixed(2)}€</strong></td>
+          <td>
+            <span class="status-badge ${b.paymentStatus==='Paid'?'paid':'pending'}" style="font-size:.72rem;">
+              <i class="fas fa-${b.paymentStatus==='Paid'?'check-circle':'clock'}"></i>
+              ${b.paymentStatus==='Paid'?'Payé':'Non payé'}
+            </span>
+          </td>
+          <td>${hostStatusBadge(b.status, b.paymentStatus)}</td>
+          <td>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;">
+              ${b.paymentStatus === 'Paid' && b.status !== 'ApprovedByHost' && b.status !== 'RejectedByHost' ? `
+                <button class="btn-approve" onclick="approveBooking('${b.id}')">
+                  <i class="fas fa-thumbs-up"></i>
+                </button>
+                <button class="btn-reject" onclick="rejectBooking('${b.id}')">
+                  <i class="fas fa-times"></i>
+                </button>` : ''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function approveBooking(id) {
+      const bookings = getBookings();
+      const b = bookings.find(b => b.id === id);
+      if (b) { b.status = 'ApprovedByHost'; saveBookings(bookings); }
+      showToast('Réservation approuvée !', 'success');
+      renderHostBookings();
+      loadOverviewStats();
+    }
+
+    function rejectBooking(id) {
+      if (!confirm('Rejeter cette réservation ?')) return;
+      const bookings = getBookings();
+      const b = bookings.find(b => b.id === id);
+      if (b) { b.status = 'RejectedByHost'; saveBookings(bookings); }
+      showToast('Réservation rejetée.', 'error');
+      renderHostBookings();
+      loadOverviewStats();
+    }
+
+    /* ========================
+       LISTING FORM — LOAD
+    ======================== */
+    function loadListingForm() {
+      const listing = getHostListing(hostUser.email);
+      renderListingBanner('listingStatusBanner');
+
+      if (listing) {
+        // Pre-fill form with existing listing data
+        document.getElementById('lFamilyName').value    = listing.familyName || '';
+        document.getElementById('lHostName').value      = listing.hostFullName || '';
+        document.getElementById('lPhone').value         = listing.phone || '';
+        document.getElementById('lWhatsapp').value      = listing.whatsapp || '';
+        document.getElementById('lEmail').value         = listing.email || '';
+        document.getElementById('lCulture').value       = listing.cultureType || '';
+        document.getElementById('lArea').value          = listing.cityArea || '';
+        document.getElementById('lPrice').value         = listing.pricePerNight || '';
+        document.getElementById('lMaxGuests').value     = listing.maxGuests || '';
+        document.getElementById('lAvailFrom').value     = listing.availableFrom || '';
+        document.getElementById('lAvailTo').value       = listing.availableTo || '';
+        document.getElementById('lDescription').value   = listing.description || '';
+        document.getElementById('lRules').value         = listing.houseRules || '';
+
+        // Languages
+        (listing.languages || []).forEach(lang => {
+          const cb = document.querySelector(`input[value="${lang}"]`);
+          if (cb && cb.closest('.lang-option')) cb.checked = true;
+        });
+        // Tags
+        (listing.tags || []).forEach(tag => {
+          const cb = document.getElementById('tag-' + tag.toLowerCase());
+          if (cb) cb.checked = true;
+        });
+        // Amenities
+        (listing.amenities || []).forEach(am => {
+          const mapping = { 'Wi-Fi':'am-wifi','Private Room':'am-room','Meals Included':'am-meals','Transport Pickup':'am-transp','Guide Support':'am-guide' };
+          const cb = document.getElementById(mapping[am]);
+          if (cb) cb.checked = true;
+        });
+        // Images
+        const imgs = listing.images || [];
+        for (let i = 0; i < 4; i++) {
+          const url = imgs[i] || '';
+          const input = document.getElementById('imgUrl' + (i+1));
+          const prev  = document.getElementById('prev' + (i+1));
+          if (input && url) { input.value = url; if (prev) prev.src = url; }
+        }
+
+        // Update UI for edit mode
+        document.getElementById('listingFormTitle').innerHTML =
+          '<i class="fas fa-edit" style="margin-right:10px;color:var(--orange-light);"></i>Modifier Mon Annonce';
+        document.getElementById('listingSubmitLabel').textContent =
+          listing.status === 'Rejected' ? 'Resoumettre pour approbation' : 'Enregistrer les modifications';
+        document.getElementById('listingDeleteBtn').classList.remove('hidden');
+      } else {
+        document.getElementById('listingFormTitle').innerHTML =
+          '<i class="fas fa-plus-circle" style="margin-right:10px;color:var(--orange-light);"></i>Créer Mon Annonce';
+        document.getElementById('listingSubmitLabel').textContent = 'Soumettre pour approbation';
+        document.getElementById('listingDeleteBtn').classList.add('hidden');
+      }
+    }
+
+    /* ========================
+       IMAGE PREVIEW
+    ======================== */
+    function previewImg(input, previewId) {
+      const preview = document.getElementById(previewId);
+      if (!preview) return;
+      const url = input.value.trim();
+      if (url) {
+        preview.src = url;
+        preview.onerror = () => { preview.src = DEFAULT_LISTING_IMAGES[0]; };
+      }
+    }
+    window.previewImg = previewImg;
+
+    /* ========================
+       LISTING FORM — SUBMIT
+    ======================== */
+    document.getElementById('listingForm').addEventListener('submit', e => {
+      e.preventDefault();
+
+      const familyName  = document.getElementById('lFamilyName').value.trim();
+      const hostName    = document.getElementById('lHostName').value.trim();
+      const phone       = document.getElementById('lPhone').value.trim();
+      const email       = document.getElementById('lEmail').value.trim();
+      const culture     = document.getElementById('lCulture').value;
+      const area        = document.getElementById('lArea').value;
+      const price       = parseFloat(document.getElementById('lPrice').value);
+      const maxGuests   = parseInt(document.getElementById('lMaxGuests').value);
+      const availFrom   = document.getElementById('lAvailFrom').value;
+      const availTo     = document.getElementById('lAvailTo').value;
+      const description = document.getElementById('lDescription').value.trim();
+
+      // Validation
+      if (!familyName || !hostName || !phone || !email || !culture || !area || !price || !maxGuests || !availFrom || !availTo || !description) {
+        showToast('Veuillez remplir tous les champs obligatoires (*).', 'error');
+        return;
+      }
+      if (!phone.match(/^\+?[\d\s]{8,15}$/)) {
+        showToast('Numéro de téléphone invalide.', 'error'); return;
+      }
+      if (price < 10) { showToast('Le prix doit être au moins 10€.', 'error'); return; }
+      if (new Date(availTo) <= new Date(availFrom)) {
+        showToast('La date de fin doit être après la date de début.', 'error'); return;
+      }
+
+      // Collect checkboxes
+      const languages  = [...document.querySelectorAll('.lang-option input:checked')].map(c => c.value);
+      const tags       = [...document.querySelectorAll('.interest-option input:checked')].map(c => c.value);
+      const amenities  = [...document.querySelectorAll('.amenity-option input:checked')].map(c => c.value);
+
+      // Collect images (use defaults if empty)
+      const images = [];
+      for (let i = 1; i <= 4; i++) {
+        const url = document.getElementById('imgUrl' + i).value.trim();
+        if (url) images.push(url);
+      }
+      if (images.length === 0) images.push(DEFAULT_LISTING_IMAGES[Math.floor(Math.random() * DEFAULT_LISTING_IMAGES.length)]);
+
+      const existing = getHostListing(hostUser.email);
+      const now      = new Date().toISOString();
+
+      const newListing = {
+        id:            existing ? existing.id : generateListingId(),
+        ownerUserId:   hostUser.email,
+        familyName,
+        hostFullName:  hostName,
+        phone,
+        whatsapp:      document.getElementById('lWhatsapp').value.trim(),
+        email,
+        cultureType:   culture,
+        cityArea:      area,
+        pricePerNight: price,
+        maxGuests,
+        availableFrom: availFrom,
+        availableTo:   availTo,
+        languages:     languages.length ? languages : ['Arabe'],
+        tags,
+        amenities,
+        houseRules:    document.getElementById('lRules').value.trim(),
+        description,
+        images,
+        rating:        existing ? (existing.rating || 4.5) : 4.5,
+        reviews:       existing ? (existing.reviews || 0) : 0,
+        // Rejected → PendingApproval on re-submit; Approved stays Approved on edit; new → PendingApproval
+        status:        existing && existing.status === 'Approved' ? 'Approved' : 'PendingApproval',
+        createdAt:     existing ? existing.createdAt : now,
+        updatedAt:     now
+      };
+
+      // Save listing
+      const listings = getListings().filter(l => l.ownerUserId !== hostUser.email);
+      listings.push(newListing);
+      saveListings(listings);
+
+      const msg = newListing.status === 'Approved'
+        ? 'Annonce mise à jour !'
+        : 'Annonce soumise ! En attente d\'approbation de l\'administrateur.';
+      showToast(msg, 'success');
+
+      // Refresh
+      renderListingBanner('listingStatusBanner');
+      document.getElementById('listingSubmitLabel').textContent = 'Enregistrer les modifications';
+      document.getElementById('listingDeleteBtn').classList.remove('hidden');
+    });
+
+    /* ========================
+       DELETE LISTING
+    ======================== */
+    function deleteMyListing() {
+      if (!confirm('Supprimer définitivement votre annonce ?')) return;
+      const listings = getListings().filter(l => l.ownerUserId !== hostUser.email);
+      saveListings(listings);
+      showToast('Annonce supprimée.', 'success');
+      showView('overview', document.querySelector('.sidebar-nav a'));
+    }
+    window.deleteMyListing = deleteMyListing;
+
+    /* ========================
+       INITIAL LOAD
+    ======================== */
+    loadOverviewStats();
+    renderRecentBookings();
+
+    // Expose globals
+    window.showView      = showView;
+    window.approveBooking = approveBooking;
+    window.rejectBooking  = rejectBooking;
+    window.toggleSidebar  = toggleSidebar;
+    window.hostLogout     = hostLogout;
+    window.renderHostBookings = renderHostBookings;
+  </script>
+</body>
+</html>

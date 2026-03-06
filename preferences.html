@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mes Préférences – Guelmim Escapes</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- Minimal sticky navbar -->
+  <nav class="navbar scrolled" style="position:sticky;top:0;z-index:200;">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo" style="color:var(--brown-dark);">
+        <i class="fas fa-sun"></i> Guelmim<span>Escapes</span>
+      </a>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <a href="index.html" class="btn-outline" style="font-size:.85rem;padding:8px 18px;">
+          <i class="fas fa-arrow-left"></i> Accueil
+        </a>
+        <span id="navUserInfo" style="font-size:.85rem;color:var(--text-light);"></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page content -->
+  <div class="prefs-page">
+    <div class="prefs-container">
+
+      <div class="prefs-card">
+
+        <!-- Card Header -->
+        <div class="prefs-card-header">
+          <h1><i class="fas fa-sliders-h" style="color:var(--orange-light);margin-right:10px;"></i>Vos Préférences de Séjour</h1>
+          <p>Remplissez ce formulaire pour recevoir une liste personnalisée de familles d'accueil correspondant parfaitement à vos attentes.</p>
+        </div>
+
+        <!-- Card Body -->
+        <div class="prefs-card-body">
+
+          <!-- Step Indicator -->
+          <div class="prefs-steps">
+            <div class="step active" id="step1">
+              <div class="step-num">1</div>
+              <span>Vos infos</span>
+            </div>
+            <div class="step" id="step2">
+              <div class="step-num">2</div>
+              <span>Dates &amp; budget</span>
+            </div>
+            <div class="step" id="step3">
+              <div class="step-num">3</div>
+              <span>Préférences</span>
+            </div>
+          </div>
+
+          <form id="prefsForm" novalidate>
+
+            <!-- ===== SECTION 1: Personal Info ===== -->
+            <div class="prefs-section">
+              <h3 class="prefs-section-title">
+                <i class="fas fa-user"></i> Informations personnelles
+              </h3>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="firstName">Prénom *</label>
+                  <input type="text" id="firstName" placeholder="Ahmed" required />
+                </div>
+                <div class="form-group">
+                  <label for="lastName">Nom *</label>
+                  <input type="text" id="lastName" placeholder="Benali" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Numéro de téléphone *</label>
+                <input type="tel" id="phone" placeholder="+212 6XX XXX XXX" required />
+              </div>
+            </div>
+
+            <!-- ===== SECTION 2: Dates & Budget ===== -->
+            <div class="prefs-section">
+              <h3 class="prefs-section-title">
+                <i class="fas fa-calendar-alt"></i> Dates &amp; Budget
+              </h3>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="arrivalDate">Date d'arrivée *</label>
+                  <input type="date" id="arrivalDate" required />
+                </div>
+                <div class="form-group">
+                  <label for="departureDate">Date de départ *</label>
+                  <input type="date" id="departureDate" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="numPeople">Nombre de personnes *</label>
+                <input type="number" id="numPeople" min="1" max="15" value="2" required />
+              </div>
+
+              <!-- Budget Slider -->
+              <div class="form-group">
+                <label>Budget maximum par nuit</label>
+                <div style="margin-bottom:10px;">
+                  <span class="budget-display" id="budgetDisplay">
+                    <i class="fas fa-euro-sign"></i> <span id="budgetVal">80</span>€ / nuit
+                  </span>
+                </div>
+                <div class="slider-wrap">
+                  <input type="range" class="budget-slider" id="budgetSlider"
+                    min="20" max="200" value="80" step="5" />
+                  <div class="slider-labels">
+                    <span>20€</span>
+                    <span>60€</span>
+                    <span>100€</span>
+                    <span>150€</span>
+                    <span>200€</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== SECTION 3: Cultural Preference ===== -->
+            <div class="prefs-section">
+              <h3 class="prefs-section-title">
+                <i class="fas fa-globe-africa"></i> Préférences culturelles
+              </h3>
+
+              <div class="form-group">
+                <label for="familyType">Type de famille préféré</label>
+                <select id="familyType">
+                  <option value="no-preference">Pas de préférence (toutes cultures)</option>
+                  <option value="Amazigh">Amazigh / Chleuh</option>
+                  <option value="Sahrawi">Sahrawi</option>
+                  <option value="Mixed">Mixte (Amazigh + Sahrawi)</option>
+                </select>
+              </div>
+
+              <!-- Interests Checkboxes -->
+              <div class="form-group">
+                <label>Vos centres d'intérêt</label>
+                <p style="font-size:.8rem;color:var(--text-light);margin-bottom:12px;">Sélectionnez tout ce qui vous intéresse pour un meilleur matching.</p>
+                <div class="interests-grid">
+                  <div class="interest-option">
+                    <input type="checkbox" id="int-food"         value="Food" />
+                    <label class="interest-label" for="int-food">
+                      <i class="fas fa-utensils"></i> Cuisine
+                    </label>
+                  </div>
+                  <div class="interest-option">
+                    <input type="checkbox" id="int-culture"      value="Culture" />
+                    <label class="interest-label" for="int-culture">
+                      <i class="fas fa-landmark"></i> Culture
+                    </label>
+                  </div>
+                  <div class="interest-option">
+                    <input type="checkbox" id="int-desert"       value="Desert" />
+                    <label class="interest-label" for="int-desert">
+                      <i class="fas fa-sun"></i> Désert
+                    </label>
+                  </div>
+                  <div class="interest-option">
+                    <input type="checkbox" id="int-souk"         value="Souk" />
+                    <label class="interest-label" for="int-souk">
+                      <i class="fas fa-store"></i> Souk
+                    </label>
+                  </div>
+                  <div class="interest-option">
+                    <input type="checkbox" id="int-music"        value="Music" />
+                    <label class="interest-label" for="int-music">
+                      <i class="fas fa-music"></i> Musique
+                    </label>
+                  </div>
+                  <div class="interest-option">
+                    <input type="checkbox" id="int-handicrafts"  value="Handicrafts" />
+                    <label class="interest-label" for="int-handicrafts">
+                      <i class="fas fa-paint-brush"></i> Artisanat
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Special Requests -->
+              <div class="form-group">
+                <label for="specialRequests">Demandes spéciales</label>
+                <textarea id="specialRequests" rows="3"
+                  placeholder="Régime alimentaire, accessibilité, souhaits particuliers..."></textarea>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-submit" id="searchBtn">
+              <i class="fas fa-magic"></i> Trouver mes familles d'accueil
+            </button>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+  <script>
+    // ============================================
+    // PREFERENCES PAGE SCRIPT
+    // ============================================
+
+    /** Set minimum date to today */
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('arrivalDate').min   = today;
+    document.getElementById('departureDate').min = today;
+
+    /** Show nav user info if logged in */
+    const user = getCurrentUser();
+    if (user) {
+      document.getElementById('navUserInfo').textContent = 'Bonjour, ' + user.name.split(' ')[0];
+    }
+
+    /** Budget slider live update + CSS fill trick */
+    const slider  = document.getElementById('budgetSlider');
+    const budgetVal = document.getElementById('budgetVal');
+
+    function updateSlider() {
+      const min = parseInt(slider.min);
+      const max = parseInt(slider.max);
+      const val = parseInt(slider.value);
+      const pct = ((val - min) / (max - min)) * 100;
+      slider.style.setProperty('--slider-pct', pct + '%');
+      budgetVal.textContent = val;
+    }
+
+    slider.addEventListener('input', updateSlider);
+    updateSlider(); // Init
+
+    /** Activate step indicators on scroll / focus */
+    const s1Fields = ['firstName','lastName','phone'];
+    const s2Fields = ['arrivalDate','departureDate','numPeople','budgetSlider'];
+
+    function updateSteps() {
+      const s1Done = s1Fields.every(id => document.getElementById(id).value.trim() !== '');
+      const s2Done = s2Fields.slice(0,3).every(id => document.getElementById(id).value.trim() !== '');
+
+      if (s1Done) {
+        document.getElementById('step1').classList.add('done');
+        document.getElementById('step2').classList.add('active');
+      }
+      if (s1Done && s2Done) {
+        document.getElementById('step2').classList.add('done');
+        document.getElementById('step3').classList.add('active');
+      }
+    }
+
+    document.querySelectorAll('#prefsForm input, #prefsForm select').forEach(el =>
+      el.addEventListener('change', updateSteps)
+    );
+
+    /** Departure date must be after arrival */
+    document.getElementById('arrivalDate').addEventListener('change', function () {
+      document.getElementById('departureDate').min = this.value;
+    });
+
+    // ============================================
+    // FORM SUBMISSION
+    // ============================================
+    document.getElementById('prefsForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      /* --- Validate required fields --- */
+      const firstName   = document.getElementById('firstName').value.trim();
+      const lastName    = document.getElementById('lastName').value.trim();
+      const phone       = document.getElementById('phone').value.trim();
+      const arrivalDate = document.getElementById('arrivalDate').value;
+      const departureDate = document.getElementById('departureDate').value;
+      const numPeople   = parseInt(document.getElementById('numPeople').value) || 1;
+
+      if (!firstName || !lastName || !phone || !arrivalDate || !departureDate) {
+        showToast('Veuillez remplir tous les champs obligatoires (*).', 'error');
+        return;
+      }
+      if (new Date(departureDate) <= new Date(arrivalDate)) {
+        showToast('La date de départ doit être après la date d\'arrivée.', 'error');
+        return;
+      }
+      if (!user) {
+        showToast('Veuillez vous connecter pour continuer.', 'error');
+        setTimeout(() => { window.location.href = 'auth.html'; }, 1500);
+        return;
+      }
+
+      /* --- Collect all values --- */
+      const budgetPerNight = parseInt(document.getElementById('budgetSlider').value);
+      const familyType     = document.getElementById('familyType').value;
+      const specialRequests = document.getElementById('specialRequests').value.trim();
+
+      // Collect checked interests
+      const interests = [];
+      document.querySelectorAll('.interest-option input:checked').forEach(cb => {
+        interests.push(cb.value);
+      });
+
+      /* --- Build preferences object --- */
+      const prefs = {
+        firstName, lastName, phone,
+        arrivalDate, departureDate,
+        numPeople,
+        budgetPerNight,
+        familyType,
+        interests,
+        specialRequests,
+        userId: user.email,
+        submittedAt: new Date().toISOString()
+      };
+
+      // Save to localStorage so results.html can read it
+      localStorage.setItem('ge_preferences', JSON.stringify(prefs));
+
+      // Visual feedback
+      const btn = document.getElementById('searchBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Recherche en cours...';
+
+      setTimeout(() => {
+        window.location.href = 'results.html';
+      }, 800);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Réservation confirmée – Guelmim Escapes</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* Confetti pieces */
+    .confetti-wrap { position:fixed; top:0;left:0;right:0;bottom:0; pointer-events:none; z-index:0; overflow:hidden; }
+    .confetti-piece { position:absolute; top:-10px; border-radius:3px; animation:confettiFall linear forwards; }
+    @keyframes confettiFall { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
+    .confirmation-page { position:relative; z-index:1; }
+  </style>
+</head>
+<body style="background:var(--bg-light);">
+
+  <div class="confetti-wrap" id="confettiWrap"></div>
+
+  <!-- Minimal Navbar -->
+  <nav class="navbar scrolled" style="position:relative;">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo" style="color:var(--brown-dark);">
+        <i class="fas fa-sun"></i> Guelmim<span>Escapes</span>
+      </a>
+      <a href="index.html" class="btn-outline"><i class="fas fa-home"></i> Accueil</a>
+    </div>
+  </nav>
+
+  <!-- Confirmation Content -->
+  <div class="confirmation-page" style="padding:48px 24px 80px;">
+    <div class="confirmation-card" id="confirmationCard">
+
+      <!-- Header -->
+      <div class="confirmation-header">
+        <div class="confirmation-icon"><i class="fas fa-check"></i></div>
+        <h1>Réservation confirmée !</h1>
+        <p>Votre séjour chez l'habitant est officiellement réservé. À très bientôt à Guelmim !</p>
+      </div>
+
+      <!-- Body -->
+      <div class="confirmation-body">
+
+        <!-- Reference -->
+        <div class="confirmation-ref">
+          <span><i class="fas fa-hashtag"></i> Référence de réservation</span>
+          <span id="bookingRef">—</span>
+        </div>
+
+        <!-- Details Grid -->
+        <div class="confirmation-details" id="confirmationDetails">
+          <!-- Injected by JS -->
+        </div>
+
+        <!-- What's Next -->
+        <div style="background:linear-gradient(135deg,rgba(232,113,42,.06),rgba(212,160,23,.06));border:1px solid var(--sand-dark);border-radius:var(--radius-md);padding:20px 22px;margin-bottom:28px;">
+          <h4 style="font-family:'Playfair Display',serif;color:var(--brown-dark);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+            <i class="fas fa-info-circle" style="color:var(--orange);"></i> Prochaines étapes
+          </h4>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+            <li style="display:flex;align-items:flex-start;gap:10px;font-size:.88rem;color:var(--text-medium);">
+              <i class="fas fa-envelope" style="color:var(--orange);margin-top:2px;flex-shrink:0;"></i>
+              Un email de confirmation sera envoyé à votre adresse enregistrée.
+            </li>
+            <li style="display:flex;align-items:flex-start;gap:10px;font-size:.88rem;color:var(--text-medium);">
+              <i class="fas fa-phone" style="color:var(--orange);margin-top:2px;flex-shrink:0;"></i>
+              La famille d'accueil vous contactera 48h avant votre arrivée.
+            </li>
+            <li style="display:flex;align-items:flex-start;gap:10px;font-size:.88rem;color:var(--text-medium);">
+              <i class="fab fa-whatsapp" style="color:var(--orange);margin-top:2px;flex-shrink:0;"></i>
+              Les détails du lieu de rendez-vous vous seront communiqués par WhatsApp.
+            </li>
+            <li style="display:flex;align-items:flex-start;gap:10px;font-size:.88rem;color:var(--text-medium);">
+              <i class="fas fa-star" style="color:var(--orange);margin-top:2px;flex-shrink:0;"></i>
+              Après votre séjour, pensez à laisser un avis pour aider les futurs voyageurs.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Actions -->
+        <div class="confirmation-actions">
+          <a href="index.html" class="btn-primary">
+            <i class="fas fa-compass"></i> Retour à l'accueil
+          </a>
+          <a href="preferences.html" class="btn-sky">
+            <i class="fas fa-search"></i> Nouvelle recherche
+          </a>
+          <button class="btn-outline" onclick="window.print()">
+            <i class="fas fa-print"></i> Imprimer
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // ============================================
+    // CONFIRMATION PAGE SCRIPT
+    // ============================================
+
+    /** Confetti animation */
+    function launchConfetti() {
+      const colors = ['#E8712A','#D4A017','#4A90D9','#27ae60','#F5DEB3','#8B4513'];
+      const wrap   = document.getElementById('confettiWrap');
+      for (let i = 0; i < 90; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left              = Math.random() * 100 + 'vw';
+        piece.style.background        = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDuration = (Math.random() * 2.5 + 1.5) + 's';
+        piece.style.animationDelay    = (Math.random() * 1.8) + 's';
+        piece.style.width             = (Math.random() * 8 + 6) + 'px';
+        piece.style.height            = (Math.random() * 10 + 8) + 'px';
+        piece.style.borderRadius      = Math.random() > .5 ? '50%' : '3px';
+        wrap.appendChild(piece);
+        piece.addEventListener('animationend', () => piece.remove());
+      }
+    }
+
+    const bookingId = localStorage.getItem('ge_last_booking_id');
+    const bookings  = getBookings();
+    const booking   = bookings.find(b => b.id === bookingId);
+
+    if (!booking) {
+      window.location.href = 'index.html';
+    } else {
+      document.getElementById('bookingRef').textContent = booking.id;
+
+      document.getElementById('confirmationDetails').innerHTML = `
+        <div class="detail-item">
+          <label>Voyageur</label>
+          <span>${booking.firstName} ${booking.lastName}</span>
+        </div>
+        <div class="detail-item">
+          <label>Famille d'accueil</label>
+          <span>${booking.selectedFamilyName}</span>
+        </div>
+        <div class="detail-item">
+          <label>Culture</label>
+          <span>${booking.familyCultureType || '—'}</span>
+        </div>
+        <div class="detail-item">
+          <label>Secteur</label>
+          <span>${booking.familyArea || '—'}</span>
+        </div>
+        <div class="detail-item">
+          <label>Arrivée</label>
+          <span>${formatDate(booking.arrivalDate)}</span>
+        </div>
+        <div class="detail-item">
+          <label>Départ</label>
+          <span>${formatDate(booking.departureDate)}</span>
+        </div>
+        <div class="detail-item">
+          <label>Nuits</label>
+          <span>${booking.nights} nuit${booking.nights > 1 ? 's' : ''}</span>
+        </div>
+        <div class="detail-item">
+          <label>Personnes</label>
+          <span>${booking.numPeople}</span>
+        </div>
+        <div class="detail-item">
+          <label>Total payé</label>
+          <span style="color:var(--orange);font-weight:700;">${booking.totalPrice.toFixed(2)}€</span>
+        </div>
+        <div class="detail-item">
+          <label>Statut paiement</label>
+          <span class="status-badge paid"><i class="fas fa-check-circle"></i> ${booking.paymentStatus}</span>
+        </div>
+        <div class="detail-item">
+          <label>Statut réservation</label>
+          <span class="status-badge approved"><i class="fas fa-calendar-check"></i> ${booking.status}</span>
+        </div>
+        ${booking.specialRequests ? `
+        <div class="detail-item" style="grid-column:1/-1;">
+          <label>Demandes spéciales</label>
+          <span style="font-weight:400;color:var(--text-light);">${booking.specialRequests}</span>
+        </div>` : ''}
+      `;
+
+      launchConfetti();
+    }
+  </script>
+</body>
+</html>
