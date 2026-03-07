@@ -1,5 +1,0 @@
-timestamp_utc,host,user,event,artifact,details
-2026-02-11T08:14:03Z,WKSTN-07,analyst,ProcessCreate,C:\Windows\System32\nslookup.exe,Unusual burst of DNS lookups detected
-2026-02-11T08:15:22Z,WKSTN-07,analyst,ProcessCreate,C:\ProgramData\cache\dns_worker.exe,Unsigned binary launched and exited quickly
-2026-02-11T08:19:41Z,WKSTN-07,analyst,FileWrite,C:\pagefile.sys,High-entropy pages increased after dns_worker.exe
-2026-02-11T08:21:10Z,WKSTN-07,analyst,ServiceStop,SysMain,Operator forced memory pressure before shutdown
